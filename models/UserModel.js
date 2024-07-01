@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
     bankDetails: {
         bankName: { type: String, required: true },
         accountNumber: { type: String, required: true },
-        bankCode: { type: String, required: true }, // Bank code required by Paystack for transfers
+        bankCode: { type: String, required: true }, // Bank code required by Paystack for the transfers
     },
     contributions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Thrift' }],
     createdAt: { type: Date, default: Date.now },
