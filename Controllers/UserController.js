@@ -5,7 +5,7 @@ const User = require("../models/UserModel");
 
 
 // User registration
-const userRegister = () => async (req, res) => {
+const userRegister = async (req, res) => {
     const { name, email, password, bankName, accountNumber, routingNumber } = req.body;
     try {
         const user = new User({
@@ -26,7 +26,7 @@ const userRegister = () => async (req, res) => {
 };
 
 // User login
-const userLogin = () => async (req, res) => {
+const userLogin = async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
