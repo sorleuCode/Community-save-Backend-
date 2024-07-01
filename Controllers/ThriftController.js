@@ -3,8 +3,8 @@ const User = require('../models/UserModel');
 const paystack = require('../paystack');
 
 
-// Create a thrift (admin only)
-router.post('/create', verifyToken, isAdmin, async (req, res) => {
+// Create a thrift (admin only) 
+const createThrift = async (req, res) => {
     const { name, description, planId } = req.body;
     try {
         const thrift = new Thrift({ name, description, planId });
@@ -13,7 +13,7 @@ router.post('/create', verifyToken, isAdmin, async (req, res) => {
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-});
+};
 
 // Join a thrift
 
@@ -87,4 +87,4 @@ const deleteThrift = async (req, res) => {
     }
 };
 
-module.exports = {joinThrift, deleteThrift, recieveThrift, contributeThrift}
+module.exports = {createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift}
