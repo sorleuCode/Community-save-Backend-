@@ -18,7 +18,7 @@ const PaymentForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-      <button type="submit">Make Payment</button>
+      <button type="submit">Make Payment Now</button>
     </form>
   );
 };
