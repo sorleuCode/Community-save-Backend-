@@ -87,4 +87,4 @@ const deleteThrift = async (req, res) => {
     }
 };
 
-module.exports = {joinThrift, deleteThrift, recieveThrift, contributeThrift}
+module.exports = {createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift}
