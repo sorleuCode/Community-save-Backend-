@@ -7,8 +7,8 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const connectDB = require("./config/DBConnet")
 const errorHandler = require("./middleware/errorMiddleware");
-const adminRoute = require("./routes/adminRoute_nm");
-const userRoute = require("./routes/userRoute_nm");
+const adminRoute = require("./routes/adminRoute");
+const userRoute = require("./routes/userRoute");
 
 
 const PORT = process.env.PORT || 3500;
