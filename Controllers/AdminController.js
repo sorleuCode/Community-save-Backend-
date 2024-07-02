@@ -7,10 +7,10 @@ const Admin = require('../models/AdminModel');
 
 // Admin registration
 const adminRegister = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { fullname, email, password } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const admin = new Admin({ name, email, password: hashedPassword });
+        const admin = new Admin({ fullname, email, password: hashedPassword });
         await admin.save();
         res.status(201).json(admin);
     } catch (error) {
@@ -18,7 +18,7 @@ const adminRegister = async (req, res) => {
     }
 };
 
-// Admin login 
+// Admin login
 const adminLogin = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -34,6 +34,25 @@ const adminLogin = async (req, res) => {
     }
 };
 
-module.exports = {adminLogin, adminRegister}
+// const adminLogin = async (req, res) => {
+//     const { email, password } = req.body;
+//     try {
+//         const admin = await Admin.findOne({ email });
+//         if (!admin) {
+//             return res.status(401).json({ message: 'Invalid email or password' });
+//         }
+        
+//         const isMatch = await bcrypt.compare(password, admin.password);
+//         if (!isMatch) {
+//             return res.status(401).json({ message: 'Invalid email or password' });
+//         }
+        
+//         const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+//         res.json({ token, admin });
+//     } catch (error) {
+//         res.status(500).json({ message: 'Server error' });
+//     }
+// };
 
+module.exports = {adminLogin, adminRegister}
 

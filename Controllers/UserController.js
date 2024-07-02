@@ -1,21 +1,24 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require("../models/UserModel");
 
+const bcrypt = require('bcryptjs');
+const User = require('../models/UserModel');
+const paystack = require('../paystack');
 
 
 // User registration
 const userRegister = async (req, res) => {
-    const { name, email, password, bankName, accountNumber, routingNumber } = req.body;
+    const { fullname, email, password, bankName, accountNumber, bankCode } = req.body;
     try {
+        const paystackCustomerId = await paystack.createCustomer(email, fullname, '');
+
         const user = new User({
-            name,
+            fullname,
             email,
-            password: await bcrypt.hash(password, 10),
+            password,
+            paystackCustomerId,
             bankDetails: {
                 bankName,
                 accountNumber,
-                routingNumber,
+                bankCode,
             },
         });
         await user.save();
