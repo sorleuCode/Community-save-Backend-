@@ -8,7 +8,3 @@ router.post("/login", adminLogin)
 
 
 module.exports = router;
-
-
-
-
