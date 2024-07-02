@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require("../models/UserModel");
 const paystack = require("../utils/paystack")
+const bcrypt = require("bcryptjs")
 
 
 
@@ -44,4 +45,18 @@ const userLogin = async (req, res) => {
     }
 };
 
-module.exports = {userRegister, userLogin};
+
+// get all users
+
+const getAllUsers = async (req, res) => {
+
+    const users = await User.find().sort("-createdAt");
+  
+    if (!users) {
+      res.status(500)
+      throw new Error("Something went wrong!")
+    }
+    res.status(200).json(users)
+  };
+
+module.exports = {userRegister, userLogin, getAllUsers};
