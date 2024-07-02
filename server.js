@@ -51,3 +51,4 @@ mongoose.connection.once("open", () => {
     app.listen(PORT, () => console.log(`server 🏃‍♂️💨 on port ${PORT}`))
 
 })
+
