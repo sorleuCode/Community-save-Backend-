@@ -34,7 +34,7 @@ app.use(cors({
 
 
 app.get("/", (req, res) => {
-    res.send("Hello Boss!")
+    res.send("We're live!")
 });
 app.use("/admin", adminRoute);
 app.use("/user", userRoute);
