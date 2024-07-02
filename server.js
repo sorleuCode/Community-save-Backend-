@@ -10,7 +10,6 @@ const errorHandler = require("./middleware/errorMiddleware");
 const adminRoute = require("./routes/adminRoute");
 const userRoute = require("./routes/userRoute");
 
-
 const PORT = process.env.PORT || 3500;
 
 app.use(express.json());
@@ -35,7 +34,7 @@ app.use(cors({
 
 
 app.get("/", (req, res) => {
-    res.send("Hello Boss!")
+    res.send("We're live!")
 });
 app.use("/admin", adminRoute);
 app.use("/user", userRoute);
@@ -52,6 +51,3 @@ mongoose.connection.once("open", () => {
     app.listen(PORT, () => console.log(`server 🏃‍♂️💨 on port ${PORT}`))
 
 })
-
-})
-
