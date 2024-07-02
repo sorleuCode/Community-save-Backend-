@@ -7,11 +7,8 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const connectDB = require("./config/DBConnet")
 const errorHandler = require("./middleware/errorMiddleware");
-const adminRoute = require("./routes/adminRoute");
-const userRoute = require("./routes/userRoute");
-const adminRoute = require("./routes/adminRoute")
-const userRoute = require("./routes/userRoute")
-
+const adminRoute = require("./routes/adminRoute_temp");
+const userRoute = require("./routes/userRoute_temp");
 
 const PORT = process.env.PORT || 3500;
 
@@ -42,9 +39,6 @@ app.get("/", (req, res) => {
 app.use("/admin", adminRoute);
 app.use("/user", userRoute);
 
-app.use("/admin", adminRoute)
-app.use("/user", userRoute)
-
 
 
 connectDB();
@@ -57,6 +51,3 @@ mongoose.connection.once("open", () => {
     app.listen(PORT, () => console.log(`server 🏃‍♂️💨 on port ${PORT}`))
 
 })
-
-})
-
