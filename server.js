@@ -9,6 +9,8 @@ const connectDB = require("./config/DBConnet")
 const errorHandler = require("./middleware/errorMiddleware");
 const adminRoute = require("./routes/adminRoute");
 const userRoute = require("./routes/userRoute");
+const adminRoute = require("./routes/adminRoute")
+const userRoute = require("./routes/userRoute")
 
 
 const PORT = process.env.PORT || 3500;
@@ -33,11 +35,15 @@ app.use(cors({
 }))
 
 
+
 app.get("/", (req, res) => {
     res.send("Hello Boss!")
 });
 app.use("/admin", adminRoute);
 app.use("/user", userRoute);
+
+app.use("/admin", adminRoute)
+app.use("/user", userRoute)
 
 
 
