@@ -9,6 +9,8 @@ const connectDB = require("./config/DBConnet")
 const errorHandler = require("./middleware/errorMiddleware");
 const adminRoute = require("./routes/adminRoute");
 const userRoute = require("./routes/userRoute");
+const adminRoute = require("./routes/adminRoute")
+const userRoute = require("./routes/userRoute")
 
 
 const PORT = process.env.PORT || 3500;
@@ -33,11 +35,15 @@ app.use(cors({
 }))
 
 
+
 app.get("/", (req, res) => {
     res.send("We're live!")
 });
 app.use("/admin", adminRoute);
 app.use("/user", userRoute);
+
+app.use("/admin", adminRoute)
+app.use("/user", userRoute)
 
 
 
@@ -49,4 +55,8 @@ mongoose.connection.once("open", () => {
     console.log("Database Connected");
 
     app.listen(PORT, () => console.log(`server 🏃‍♂️💨 on port ${PORT}`))
+
 })
+
+})
+

@@ -15,4 +15,3 @@ router.post("/register", adminRegister);
 router.post("/login", adminLogin);
 
 module.exports = router;
-
