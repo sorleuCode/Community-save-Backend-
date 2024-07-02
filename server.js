@@ -50,4 +50,8 @@ mongoose.connection.once("open", () => {
     console.log("Database Connected");
 
     app.listen(PORT, () => console.log(`server 🏃‍♂️💨 on port ${PORT}`))
+
 })
+
+})
+
