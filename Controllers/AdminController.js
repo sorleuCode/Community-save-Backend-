@@ -9,8 +9,8 @@ const Admin = require('../models/AdminModel');
 const adminRegister = async (req, res) => {
     const { fullname, email, password } = req.body;
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const admin = new Admin({ fullname, email, password: hashedPassword });
+    
+        const admin = new Admin({ fullname, email, password});
         await admin.save();
         res.status(201).json(admin);
     } catch (error) {
@@ -19,40 +19,40 @@ const adminRegister = async (req, res) => {
 };
 
 // Admin login
-const adminLogin = async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const admin = await Admin.findOne({ email });
-        if (admin && await bcrypt.compare(password, admin.password)) {
-            const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
-            res.json({ token, admin });
-        } else {
-            res.status(400).json({ message: 'Invalid credentials' });
-        }
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
 // const adminLogin = async (req, res) => {
 //     const { email, password } = req.body;
 //     try {
 //         const admin = await Admin.findOne({ email });
-//         if (!admin) {
-//             return res.status(401).json({ message: 'Invalid email or password' });
+//         if (admin && await bcrypt.compare(password, admin.password)) {
+//             const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+//             res.json({ token, admin });
+//         } else {
+//             res.status(400).json({ message: 'Invalid credentials' });
 //         }
-        
-//         const isMatch = await bcrypt.compare(password, admin.password);
-//         if (!isMatch) {
-//             return res.status(401).json({ message: 'Invalid email or password' });
-//         }
-        
-//         const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
-//         res.json({ token, admin });
 //     } catch (error) {
-//         res.status(500).json({ message: 'Server error' });
+//         res.status(400).json({ message: error.message });
 //     }
 // };
+
+const adminLogin = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+        
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+        
+        const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        res.json({ token, admin });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 
 module.exports = {adminLogin, adminRegister}
 

@@ -1,7 +1,7 @@
 
 const bcrypt = require('bcryptjs');
 const User = require('../models/UserModel');
-const paystack = require('../paystack');
+const paystack = require('../utils/paystack');
 
 
 // User registration
