@@ -1,13 +1,14 @@
 const Thrift = require('../models/ThriftModel');
 const User = require('../models/UserModel');
-const paystack = require('../paystack');
+const paystack = require('../utils/paystack');
 
 
 // Create a thrift (admin only) 
 const createThrift = async (req, res) => {
-    const { name, description, planId } = req.body;
+    const { name, description, planId, amount } = req.body;
     try {
-        const thrift = new Thrift({ name, description, planId });
+        const thrift = new Thrift({ name, description, planId , amount });
+        thrift.contributions.push({amount});
         await thrift.save();
         res.status(201).json(thrift);
     } catch (error) {
@@ -24,9 +25,16 @@ const joinThrift = async (req, res) => {
         thrift.participants.push(userId);
         await thrift.save();
 
+        const amount = thrift.contributions[0].amount;
+    
+        console.log(amount)
+
         const user = await User.findById(userId);
         user.contributions.push(thrift._id);
+        const email = user.email
         await user.save();
+
+        await paystack.initializePayment(email, amount); // Replace 5000 with the actual amount
 
         // Create a subscription for the user
         await paystack.createSubscription(user.paystackCustomerId, thrift.planId);
@@ -49,6 +57,9 @@ const contributeThrift =  async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+
+
 
 // Select a user to receive contributions (admin only)
 const recieveThrift = async (req, res) => {

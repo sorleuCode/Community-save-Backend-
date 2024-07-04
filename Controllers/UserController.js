@@ -1,4 +1,3 @@
-
 const jwt = require('jsonwebtoken');
 const User = require("../models/UserModel");
 const paystack = require("../utils/paystack")
@@ -8,8 +7,14 @@ const bcrypt = require("bcryptjs")
 // User registration
 const userRegister = async (req, res) => {
     const { fullname, email, password, bankName, accountNumber, bankCode } = req.body;
+
+    const names = fullname.split(' ');
+    const firstName = names[0];
+    const lastName = names.slice(1).join(' ') || '';
     try {
-        const paystackCustomerId = await paystack.createCustomer(email, fullname, '');
+        const paystackCustomerId = await paystack.createCustomer(email, firstName, lastName)
+        console.log("here")
+        console.log(paystackCustomerId)
 
         const user = new User({
             fullname,
@@ -60,4 +65,3 @@ const getAllUsers = async (req, res) => {
   };
 
 module.exports = {userRegister, userLogin, getAllUsers};
-
