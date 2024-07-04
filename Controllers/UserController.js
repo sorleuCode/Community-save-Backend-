@@ -3,7 +3,6 @@ const User = require("../models/UserModel");
 const paystack = require("../utils/paystack")
 const bcrypt = require("bcryptjs")
 
-
 // User registration
 const userRegister = async (req, res) => {
     const { fullname, email, password, bankName, accountNumber, bankCode } = req.body;
