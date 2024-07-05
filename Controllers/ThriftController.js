@@ -87,7 +87,7 @@ const contributeThrift = async (req, res) => {
 const recieveThrift = async (req, res) => {
     try {
         const thrift = await Thrift.findById(req.params.id).populate('participants');
-        const selectedUser = thrift.participants[Math.floor(Math.random() * thrift.participants.length)];
+        const selectedUser = thrift.potentialReceiver[Math.floor(Math.random() * thrift.potentialReceiver.length)];
         thrift.selectedUser = selectedUser;
         await thrift.save();
 
