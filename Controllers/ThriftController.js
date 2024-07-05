@@ -7,8 +7,8 @@ const paystack = require('../utils/paystack');
 const createThrift = async (req, res) => {
     const { name, description, planId, amount } = req.body;
     try {
-        const thrift = new Thrift({ name, description, planId , amount });
-        thrift.contributions.push({amount});
+        const thrift = new Thrift({ name, description, planId, amount });
+        thrift.contributions.push({ amount });
         await thrift.save();
         res.status(201).json(thrift);
     } catch (error) {
@@ -26,18 +26,27 @@ const joinThrift = async (req, res) => {
         await thrift.save();
 
         const amount = thrift.contributions[0].amount;
-    
-        console.log(amount)
+
+        // console.log(amount)
 
         const user = await User.findById(userId);
         user.contributions.push(thrift._id);
         const email = user.email
         await user.save();
 
-        await paystack.initializePayment(email, amount); // Replace 5000 with the actual amount
+
+        const ref = await paystack.initializePayment(email, amount);
+
+        console.log(ref)
+        const verifyAuth = await paystack.verifyPayment(ref.data.reference)
+
+        console.log(verifyAuth)
+
+        await paystack.createSubscription(user.paystackCustomerId, thrift.planId);
+
+        // Replace 5000 with the actual amount
 
         // Create a subscription for the user
-        await paystack.createSubscription(user.paystackCustomerId, thrift.planId);
 
         res.json(thrift);
     } catch (error) {
@@ -45,8 +54,21 @@ const joinThrift = async (req, res) => {
     }
 };
 
+// const verifyPayment = async(req, res) => {
+//     const {reference} = req.query
+
+//     try {
+
+//         const verifyAuth = await paystack.verifyPayment(reference)
+
+        
+//     } catch (error) {
+        
+//     }
+// }
+
 // Contribute to a thrift
-const contributeThrift =  async (req, res) => {
+const contributeThrift = async (req, res) => {
     const { userId, amount } = req.body;
     try {
         const thrift = await Thrift.findById(req.params.id);
@@ -91,11 +113,11 @@ const deleteThrift = async (req, res) => {
             return res.status(404).json({ message: 'Thrift not found' });
         }
 
-        await thrift.remove();
+        await thrift.deleteOne();
         res.json({ message: 'Thrift deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-module.exports = {createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift}
+module.exports = { createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift }
