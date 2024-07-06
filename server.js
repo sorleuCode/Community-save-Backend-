@@ -39,8 +39,7 @@ app.get("/", (req, res) => {
 });
 app.use("/admin", adminRoute);
 app.use("/user", userRoute);
-app.use("/thrift", thriftRoute);
-
+app.use("/thrift", thriftRoute)
 
 
 connectDB();
