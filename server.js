@@ -9,6 +9,7 @@ const connectDB = require("./config/DBConnet")
 const errorHandler = require("./middleware/errorMiddleware");
 const adminRoute = require("./routes/adminRoute");
 const userRoute = require("./routes/userRoute");
+const thriftRoute = require("./routes/thriftRoute")
 
 const PORT = process.env.PORT || 3500;
 
@@ -38,6 +39,7 @@ app.get("/", (req, res) => {
 });
 app.use("/admin", adminRoute);
 app.use("/user", userRoute);
+app.use("/thrift", thriftRoute)
 
 
 
