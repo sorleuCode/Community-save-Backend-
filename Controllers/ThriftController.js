@@ -18,38 +18,30 @@ const createThrift = async (req, res) => {
 // Join a thrift
 
 const joinThrift = async (req, res) => {
-  const { userId } = req.body;
-  try {
-    const thrift = await Thrift.findById(req.params.id);
-    thrift.participants.push(userId);
-    await thrift.save();
+    const { userId } = req.body;
+    try {
+        const thrift = await Thrift.findById(req.params.id);
+        thrift.participants.push(userId);
+        // thrift.contributions.push({user: userId})
+        await thrift.save();
 
-    const amount = thrift.contributions[0].amount;
+        
+        const amount = thrift.contributions[0].amount
+        // console.log(amount)
 
-    // console.log(amount)
+        const user = await User.findById(userId);
+        user.contributions.push(thrift._id);
+        const email = user.email
+        await user.save();
 
-    const user = await User.findById(userId);
-    user.contributions.push(thrift._id);
-    const email = user.email;
-    await user.save();
 
-    const ref = await paystack.initializePayment(email, amount);
+        const ref = await paystack.initializePayment(email, amount);
 
-    console.log(ref);
-    const verifyAuth = await paystack.verifyPayment(ref.data.reference);
-
-    console.log(verifyAuth);
-
-    await paystack.createSubscription(user.paystackCustomerId, thrift.planId);
-
-    // Replace 5000 with the actual amount
-
-    // Create a subscription for the user
-
-    res.json(thrift);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
+        console.log(ref)
+        res.status(200).json(thrift)
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 };
 
 // const verifyPayment = async(req, res) => {
