@@ -1,9 +1,7 @@
-
 const jwt = require('jsonwebtoken');
 const User = require("../models/UserModel");
 const paystack = require("../utils/paystack")
 const bcrypt = require("bcryptjs")
-
 
 // User registration
 const userRegister = async (req, res) => {
@@ -66,4 +64,3 @@ const getAllUsers = async (req, res) => {
   };
 
 module.exports = {userRegister, userLogin, getAllUsers};
-

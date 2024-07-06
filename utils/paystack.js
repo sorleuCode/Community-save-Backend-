@@ -97,6 +97,7 @@ const verifyPayment = (reference) => {
 
 
 
+
 // const initialize = async (email, amount) => {
 //     try {
 //         const response = await axios.post(
@@ -115,9 +116,6 @@ const verifyPayment = (reference) => {
 //     }
 // };
 
-
-
-
 // const createCustomer =  (email, firstname, surname) => {
 
 //         const params = JSON.stringify({
@@ -133,6 +131,7 @@ const verifyPayment = (reference) => {
 //             method: 'POST',
 //             headers: {
 //                 Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+
 //                 'Content-Type': 'application/json'
 //             }
 //         }
@@ -146,7 +145,6 @@ const verifyPayment = (reference) => {
 
 //             res.on('end', () => {
 //                 console.log(JSON.parse(data))
-
 
 //             })
 
@@ -171,12 +169,13 @@ const createCustomer = async (email, firstName, lastName) => {
     } catch (error) {
         throw error;
     }
+// }
+
 };
 
 
 
 const createSubscription = async (customerId, planId) => {
-
     const params = JSON.stringify({
         "customer": customerId,
         "plan": planId
@@ -235,7 +234,6 @@ const createSubscription = async (customerId, planId) => {
 
 
 
-
 const createTransferRecipient = async (name, accountNumber, bankCode) => {
 
     const params = JSON.stringify({
@@ -275,9 +273,6 @@ const createTransferRecipient = async (name, accountNumber, bankCode) => {
     req.end()
 }
 
-
-
-
 // const createTransferRecipient = async (name, accountNumber, bankCode) => {
 //     try {
 //         const response = await axiosInstance.post('/transferrecipient', {
@@ -291,7 +286,6 @@ const createTransferRecipient = async (name, accountNumber, bankCode) => {
 //         throw error;
 //     }
 // };
-
 
 
 
@@ -348,6 +342,21 @@ const initiateTransfer = async () => {
 // };
 
 
+
+
+// const initiateTransfer = async (recipientCode, amount) => {
+//     try {
+//         const response = await axiosInstance.post('/transfer', {
+//             source: 'balance',
+//             amount: amount * 100,  // Convert amount to kobo
+//             recipient: recipientCode,
+//         });
+//         return response.data;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
+
 module.exports = {
     createCustomer,
     createSubscription,
@@ -355,5 +364,4 @@ module.exports = {
     initiateTransfer,
     initializePayment,
     verifyPayment
-
 };

@@ -42,7 +42,6 @@ app.use("/user", userRoute);
 app.use("/thrift", thriftRoute)
 
 
-
 connectDB();
 
 app.use(errorHandler);
