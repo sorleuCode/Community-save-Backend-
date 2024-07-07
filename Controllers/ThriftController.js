@@ -169,4 +169,4 @@ const deleteThrift = async (req, res) => {
 
 };
 
-module.exports = { createThrift, joinThrift, deleteThrift, receiveThrift, contributeThrift, paymentVerification, getAllThrifts }
+module.exports = { createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift, paymentVerification, getAllThrifts }
