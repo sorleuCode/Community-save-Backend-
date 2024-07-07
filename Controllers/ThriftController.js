@@ -5,19 +5,23 @@ const paystack = require('../utils/paystack');
 
 // Create a thrift (admin only)
 const createThrift = async (req, res) => {
-  const { name, description, planId, amount } = req.body;
-  try {
-      const existingThrift = await Thrift.findOne({planId});
-      if (existingThrift) {
-          return res.status(400).json({ message: 'Thrift with this planId already exists' });
+    const { name, description, planId, amount } = req.body;
+
+
+    try {
+
+      const thriftExist = Thrift.findOne(planId)
+      if (thriftExist) {
+        return res.status(400).json({ message: 'Thrift with this planId already exists' });
       }
-      const thrift = new Thrift({ name, description, planId , amount });
-      thrift.contributions.push({amount});
-      await thrift.save();
-      res.status(201).json(thrift);
-  } catch (error) {
-      res.status(400).json({ message: error.message });
-  }
+      
+        const thrift = new Thrift({ name, description, planId, amount, adminId: req.user._id });
+        thrift.contributions.push({ amount });
+        await thrift.save();
+        res.status(201).json(thrift);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 };
 
 // Join a thrift
@@ -88,34 +92,53 @@ const contributeThrift = async (req, res) => {
 };
 
 // Select a user to receive contributions (admin only)
-const receiveThrift = async (req, res) => {
-  try {
-    const thrift = await Thrift.findById(req.params.id).populate(
-      "participants"
-    );
-    // const thrift = await Thrift.findById(req.params.id).populate(
-    //   "participants"
-    // );
-    const selectedUser =
-      thrift.potentialReceiver[
-        Math.floor(Math.random() * thrift.potentialReceiver.length)
-      ];
-    thrift.selectedUser = selectedUser;
-    await thrift.save();
-
-    // Create a transfer recipient and initiate transfer
-    const recipientCode = await paystack.createTransferRecipient(
-      selectedUser.name,
-      selectedUser.bankDetails.accountNumber,
-      selectedUser.bankDetails.bankCode
-    );
-    await paystack.initiateTransfer(recipientCode, thrift.totalContributions);
-
-    res.json(selectedUser);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
+const recieveThrift = async (req, res) => {
+    try {
+      const thrift = await Thrift.findById(req.params.id).populate('participants').populate('adminId');
+      
+      if (!thrift) {
+        return res.status(404).json({ message: 'Thrift not found' });
+      }
+  
+      // Check if all participants have contributed
+      const allContributed = thrift.participants.every(participant => participant.hasContributed);
+      
+      if (!allContributed) {
+        return res.status(400).json({ message: 'Not all participants have contributed' });
+      }
+  
+      // Calculate the admin fee (e.g., 10% of total contributions)
+      const adminFeePercentage = 0.10;
+      const adminFee = thrift.totalContributions * adminFeePercentage;
+      const payoutAmount = thrift.totalContributions - adminFee;
+  
+      // Select a random participant
+      const selectedUser = thrift.participants[Math.floor(Math.random() * thrift.potentialReceiver.length)];
+      thrift.selectedUser = selectedUser;
+      await thrift.save();
+  
+      // Create a transfer recipient for the selected user and initiate transfer
+      const recipientCode = await paystack.createTransferRecipient(
+        selectedUser.fullname,
+        selectedUser.bankDetails.accountNumber,
+        selectedUser.bankDetails.bankCode
+      );
+      await paystack.initiateTransfer(recipientCode, payoutAmount);
+  
+      // Create a transfer recipient for the admin and initiate transfer
+      const adminRecipientCode = await paystack.createTransferRecipient(
+        thrift.admin.fullname,
+        thrift.admin.bankDetails.accountNumber,
+        thrift.admin.bankDetails.bankCode
+      );
+      await paystack.initiateTransfer(adminRecipientCode, adminFee);
+  
+      res.json({ selectedUser, adminFee });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  };
+  
 
 
 const getAllThrifts = async (req, res) => {
