@@ -12,4 +12,5 @@ const createToken = (adminId) => {
     return jwt.sign({ id: adminId }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1d' });
 };
 
+
 module.exports = createToken;
