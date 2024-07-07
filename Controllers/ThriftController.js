@@ -67,7 +67,15 @@ const paymentVerification = async (req, res) => {
         // Create a subscription using the authorization code
         const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
 
-        res.status(200).json({ subscriptionId, paymentDetails });
+
+        const thrift = Thrift.findOne(planId)
+
+        if (subscriptionId.status) {
+          
+          
+          res.status(200).json({ subscriptionId, paymentDetails });
+        }
+
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
