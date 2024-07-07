@@ -5,6 +5,11 @@ const AdminSchema = new mongoose.Schema({
     fullname: { type: String, required: true },
     email: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true },
+    bankDetails: {
+        bankName: { type: String, required: true },
+        accountNumber: { type: String, required: true },
+        bankCode: { type: String, required: true }, // Bank code required by Paystack for transfers
+    },
     role: { type: String, default: 'admin' },
     createdAt: { type: Date, default: Date.now },
 });
