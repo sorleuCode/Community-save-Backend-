@@ -74,7 +74,6 @@ const paymentVerification = async (req, res) => {
 
         if (subscriptionId.status) {
           
-          
           res.status(200).json({ subscriptionId, paymentDetails });
         }
 
