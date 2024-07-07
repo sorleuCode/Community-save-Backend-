@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 require('dotenv')
 const Admin = require("../models/AdminModel");
-const Thrift = require("../models/ThriftModel");
 
 const verifyToken = async (req, res, next) => {
 
@@ -13,6 +12,7 @@ const verifyToken = async (req, res, next) => {
     try {
 
       const token = authHeader.split(" ")[1];
+      console.log(token)
       if (!token) {
         res.status(401);
         throw new Error("Not authorized, no token");

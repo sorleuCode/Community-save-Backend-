@@ -34,7 +34,7 @@ const adminRegister = async (req, res) => {
             secure: true
         });
 
-        res.status(201).json({ message: 'Admin registered successfully', admin });
+        res.status(201).json({ message: 'Admin registered successfully', admin, token });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -65,11 +65,30 @@ const adminLogin = async (req, res) => {
         });
 
 
-        res.status(200).json({ message: 'Admin logged in successfully' });
+        res.status(200).json({ message: 'Admin logged in successfully', token });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
 
 
-module.exports = { adminLogin, adminRegister }
+
+const logoutAdmin = async (req, res) => {
+
+
+    // Clear the "token" cookie by setting it to an empty string and an expiration date in the past
+    res.cookie("token", "", {
+      path: "/",
+      httpOnly: true,
+      expires: new Date(0), // Setting the expiration date to a time in the past to effectively delete the cookie
+      sameSite: "none",     // This attribute helps with cross-site request protection
+      secure: true,         // Ensures the cookie is sent only over HTTPS
+    });
+  
+    // Send a 200 OK response with a message indicating successful logout
+    res.status(200).json({ message: "Logout successful" });
+  };
+  
+
+
+module.exports = { adminLogin, adminRegister, logoutAdmin }

@@ -10,7 +10,7 @@ const createThrift = async (req, res) => {
 
     try {
 
-      const thriftExist = Thrift.findOne(planId)
+      const thriftExist = await Thrift.findOne({planId})
       if (thriftExist) {
         return res.status(400).json({ message: 'Thrift with this planId already exists' });
       }
@@ -70,9 +70,16 @@ const paymentVerification = async (req, res) => {
 
         const thrift = Thrift.findOne(planId)
 
+        if (!thrift) {
+          return res.status(404).json({ message: 'Thrift plan not found' });
+        }
+    
         if (subscriptionId.status) {
-          
-          
+          // Update totalContributions by adding the incoming amount
+          const amount = paymentDetails.data.amount / 100
+          thrift.totalContributions += amount
+          await thrift.save();
+    
           res.status(200).json({ subscriptionId, paymentDetails });
         }
 
