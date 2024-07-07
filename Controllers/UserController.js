@@ -7,6 +7,12 @@ const bcrypt = require("bcryptjs")
 const userRegister = async (req, res) => {
     const { fullname, email, password, bankName, accountNumber, bankCode } = req.body;
 
+    const userExist = User.findOne(email)
+
+    if (userExist) {
+        return res.status(400).json({ message: 'User with this email already exists' });
+    }
+
     const names = fullname.split(' ');
     const firstName = names[0];
     const lastName = names.slice(1).join(' ') || '';

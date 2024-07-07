@@ -3,7 +3,7 @@ require('dotenv')
 
 const createToken = (adminId) => {
     if (!adminId) {
-        throw new Error('adminEmail is required to generate a token');
+        throw new Error('adminId is required to generate a token');
     }
     if (!process.env.JWT_SECRET) {
         throw new Error('JWT_SECRET environment variable is not set');
