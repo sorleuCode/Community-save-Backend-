@@ -54,5 +54,38 @@ const adminLogin = async (req, res) => {
     }
 };
 
-module.exports = {adminLogin, adminRegister}
+const getAdmins = async (req, res) => {
+    const admins = await Admin.find().sort("-createdAt").select("-password");
+    if (!admins) {
+      res.status(500);
+      throw new Error("Something went wrong");
+    }
+    res.status(200).json(admins);
+};
+  
+const getAdmin = async (req, res) => {
+    // try {
+    const { adminId } = req.params;
+  
+    const admin = await Admin.findById(adminId);
+  
+    if (admin) {
+      const { _id, fullname, email, role } = admin;
+  
+      res.status(200).json({
+        _id,
+        fullname,
+        email,
+        role,
+      });
+    } else {
+      res.status(404).json({ message: "Admin not found" });
+    }
+    // } catch (error) {
+    //   console.error(error.message);
+    //   res.status(500).send("Server error");
+    // }
+  };
+
+module.exports = {adminLogin, adminRegister, getAdmins, getAdmin}
 

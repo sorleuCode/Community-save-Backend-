@@ -5,15 +5,19 @@ const paystack = require('../utils/paystack');
 
 // Create a thrift (admin only)
 const createThrift = async (req, res) => {
-    const { name, description, planId, amount } = req.body;
-    try {
-        const thrift = new Thrift({ name, description, planId, amount });
-        thrift.contributions.push({ amount });
-        await thrift.save();
-        res.status(201).json(thrift);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
+  const { name, description, planId, amount } = req.body;
+  try {
+      const existingThrift = await Thrift.findOne({planId});
+      if (existingThrift) {
+          return res.status(400).json({ message: 'Thrift with this planId already exists' });
+      }
+      const thrift = new Thrift({ name, description, planId , amount });
+      thrift.contributions.push({amount});
+      await thrift.save();
+      res.status(201).json(thrift);
+  } catch (error) {
+      res.status(400).json({ message: error.message });
+  }
 };
 
 // Join a thrift
@@ -23,6 +27,7 @@ const joinThrift = async (req, res) => {
     try {
         const thrift = await Thrift.findById(req.params.id);
         thrift.participants.push(userId);
+        thrift.potentialReceiver.push(userId);
         // thrift.contributions.push({user: userId})
         await thrift.save();
 
@@ -55,6 +60,7 @@ const paymentVerification = async (req, res) => {
         const {customer, authorization} = paymentDetails.data;
 
         console.log("cutomer", customer)
+        
 
         // Create a subscription using the authorization code
         const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
@@ -82,11 +88,14 @@ const contributeThrift = async (req, res) => {
 };
 
 // Select a user to receive contributions (admin only)
-const recieveThrift = async (req, res) => {
+const receiveThrift = async (req, res) => {
   try {
     const thrift = await Thrift.findById(req.params.id).populate(
       "participants"
     );
+    // const thrift = await Thrift.findById(req.params.id).populate(
+    //   "participants"
+    // );
     const selectedUser =
       thrift.potentialReceiver[
         Math.floor(Math.random() * thrift.potentialReceiver.length)
@@ -137,4 +146,4 @@ const deleteThrift = async (req, res) => {
 
 };
 
-module.exports = { createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift, paymentVerification, getAllThrifts }
+module.exports = { createThrift, joinThrift, deleteThrift, receiveThrift, contributeThrift, paymentVerification, getAllThrifts }
