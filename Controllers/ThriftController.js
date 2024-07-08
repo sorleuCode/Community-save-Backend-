@@ -67,7 +67,11 @@ const paymentVerification = async (req, res) => {
 
     // Create a subscription using the authorization code
     const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
-
+        // Create a subscription using the authorization code        
+        const {customerId} =  customer
+        const user = await User.findOne({customerId})
+        const paystackCustomerId =  customer.id
+        
     const paystackCustomerId = customer.id
 
     console.log(paystackCustomerId)
@@ -78,6 +82,22 @@ const paymentVerification = async (req, res) => {
 
     const thrift = await Thrift.findOne({ planId })
     console.log(thrift)
+       
+
+        if (!thrift) {
+          return res.status(404).json({ message: 'Thrift plan not found' });
+        }
+    
+        if (paymentDetails.status && user) {
+
+          const amount = paymentDetails.data.amount / 100
+          thrift.hasContributed.push(user._id)
+          thrift.potentialReceiver.push(user._id)
+          thrift.totalContributions += amount
+          await thrift.save();
+    
+          }
+        res.status(200).json({ subscriptionId, paymentDetails });
 
     if (!thrift) {
       return res.status(404).json({ message: 'Thrift plan not found' });
@@ -135,6 +155,9 @@ const recieveThrift = async (req, res) => {
       return res.status(404).json({ message: 'Thrift not found' });
 
     }
+
+  };
+
 
     // Check if all participants have contributed
     const allContributed = (thrift.hasContributed.length === thrift.participants.length)
