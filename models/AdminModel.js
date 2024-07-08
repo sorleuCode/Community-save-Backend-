@@ -5,6 +5,7 @@ const AdminSchema = new mongoose.Schema({
     fullname: { type: String, required: true },
     email: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true },
+    recievedProfit: { type: Number},
     bankDetails: {
         bankName: { type: String, required: true },
         accountNumber: { type: String, required: true },
