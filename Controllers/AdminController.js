@@ -71,21 +71,24 @@ const adminLogin = async (req, res) => {
     }
 };
 
+
+
 const logoutAdmin = async (req, res) => {
 
 
-  // Clear the "token" cookie by setting it to an empty string and an expiration date in the past
-  res.cookie("token", "", {
-    path: "/",
-    httpOnly: true,
-    expires: new Date(0), // Setting the expiration date to a time in the past to effectively delete the cookie
-    sameSite: "none",     // This attribute helps with cross-site request protection
-    secure: true,         // Ensures the cookie is sent only over HTTPS
-  });
-
-  // Send a 200 OK response with a message indicating successful logout
-  res.status(200).json({ message: "Logout successful" });
-};
+    // Clear the "token" cookie by setting it to an empty string and an expiration date in the past
+    res.cookie("token", "", {
+      path: "/",
+      httpOnly: true,
+      expires: new Date(0), // Setting the expiration date to a time in the past to effectively delete the cookie
+      sameSite: "none",     // This attribute helps with cross-site request protection
+      secure: true,         // Ensures the cookie is sent only over HTTPS
+    });
+  
+    // Send a 200 OK response with a message indicating successful logout
+    res.status(200).json({ message: "Logout successful" });
+  };
+  
 
 
 module.exports = { adminLogin, adminRegister, logoutAdmin }
