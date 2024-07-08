@@ -7,8 +7,4 @@ const {adminRegister, adminLogin, logoutAdmin} = require("../Controllers/AdminCo
 router.post("/register", adminRegister)
 router.post("/login", adminLogin)
 router.post("/logout", logoutAdmin)
-// router.get("/", getAdmins)
-// router.get("/:adminId", getAdmin)
-
-
 module.exports = router;
