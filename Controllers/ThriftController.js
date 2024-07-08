@@ -10,6 +10,12 @@ const createThrift = async (req, res) => {
 
     try {
 
+<<<<<<< HEAD
+=======
+    const thriftExist = await Thrift.findOne({planId})
+    if (thriftExist) {
+      return res.status(400).json({ message: 'Thrift with this planId already exists' });
+>>>>>>> b618994b8aa9e7a79606d5de4980d7b61a22ddaf
       const thriftExist = await Thrift.findOne({planId})
       if (thriftExist) {
         return res.status(400).json({ message: 'Thrift with this planId already exists' });
@@ -21,7 +27,19 @@ const createThrift = async (req, res) => {
         res.status(201).json(thrift);
     } catch (error) {
         res.status(400).json({ message: error.message });
+<<<<<<< HEAD
     }
+=======
+   }
+    
+      const thrift = new Thrift({ name, description, planId, amount, adminId: req.user._id });
+      thrift.contributions.push({ amount });
+      await thrift.save();
+      res.status(201).json(thrift);
+  } catch (error) {
+      res.status(400).json({ message: error.message });
+  }
+>>>>>>> b618994b8aa9e7a79606d5de4980d7b61a22ddaf
 };
 
 // Join a thrift
@@ -66,6 +84,7 @@ const paymentVerification = async (req, res) => {
 
         // Create a subscription using the authorization code
         const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
+<<<<<<< HEAD
         
         const {customerId} =  customer
         const user = await User.findOne({customerId})
@@ -73,12 +92,43 @@ const paymentVerification = async (req, res) => {
 
         const thrift = await Thrift.findOne({planId})
         
+=======
+        console.log("subscriptionId", subscriptionId)
+        // Create a subscription using the authorization code
+        const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
+        
+        const paystackCustomerId =  customer.id
+
+        console.log(paystackCustomerId)
+
+        const user = await User.findOne({paystackCustomerId})
+        console.log(user)
+
+
+        if (subscriptionId.status) {
+          
+          res.status(200).json({ subscriptionId, paymentDetails });
+        const thrift = await Thrift.findOne({planId})
+        console.log(thrift)
+>>>>>>> b618994b8aa9e7a79606d5de4980d7b61a22ddaf
 
         if (!thrift) {
           return res.status(404).json({ message: 'Thrift plan not found' });
         }
     
         if (paymentDetails.status && user) {
+
+          const amount = paymentDetails.data.amount / 100
+          thrift.hasContributed.push(user._id)
+          thrift.potentialReceiver.push(user._id)
+          thrift.totalContributions += amount
+          await thrift.save();
+    
+          }
+        res.status(200).json({ subscriptionId, paymentDetails });
+
+    
+        if (paymentDetails.data.status && user) {
 
           const amount = paymentDetails.data.amount / 100
           thrift.hasContributed.push(user._id)
