@@ -65,10 +65,6 @@ const paymentVerification = async (req, res) => {
     const user = await User.findOne({ paystackCustomerId })
     console.log(user)
         // Create a subscription using the authorization code
-  
-
-    const user = await User.findOne({ paystackCustomerId })
-    console.log(user)
     
         const thrift = await Thrift.findOne({planId})
         console.log(thrift)
