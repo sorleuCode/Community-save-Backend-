@@ -5,6 +5,7 @@ const UserSchema = new mongoose.Schema({
     fullname: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    recievedPayment: { type: Number},
     paystackCustomerId: { type: Number, required: true }, // Paystack customer ID
     bankDetails: {
         bankName: { type: String, required: true },

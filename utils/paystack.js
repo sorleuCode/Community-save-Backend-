@@ -243,129 +243,104 @@ const createSubscription = async (customerId, planId) => {
 
 
 
-
 const createTransferRecipient = async (name, accountNumber, bankCode) => {
-
-    const params = JSON.stringify({
-        "type": "nuban",
-        "name": name,
-        "account_number": accountNumber,
-        "bank_code": bankCode,
-        "currency": "NGN"
-    })
-
-    const options = {
-        hostname: 'api.paystack.co',
-        port: 443,
-        path: '/transferrecipient',
-        method: 'POST',
-        headers: {
-            Authorization: PAYSTACK_SECRET_KEY,
-            'Content-Type': 'application/json'
-        }
-    }
-
-    const req = https.request(options, res => {
-        let data = ''
-
-        res.on('data', (chunk) => {
-            data += chunk
+    return new Promise((resolve, reject) => {
+        const params = JSON.stringify({
+            "type": "nuban",
+            "name": name,
+            "account_number": accountNumber,
+            "bank_code": bankCode,
+            "currency": "NGN"
         });
 
-        res.on('end', () => {
-            console.log(JSON.parse(data))
-        })
-    }).on('error', error => {
-        console.error(error)
-    })
+        const options = {
+            hostname: 'api.paystack.co',
+            port: 443,
+            path: '/transferrecipient',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        };
 
-    req.write(params)
-    req.end()
-}
+        const req = https.request(options, res => {
+            let data = '';
 
-// const createTransferRecipient = async (name, accountNumber, bankCode) => {
-//     try {
-//         const response = await axiosInstance.post('/transferrecipient', {
-//             type: 'nuban',
-//             name: name,
-//             account_number: accountNumber,
-//             bank_code: bankCode,
-//         });
-//         return response.data.data.recipient_code;
-//     } catch (error) {
-//         throw error;
-//     }
-// };
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
 
-
-
-
-const initiateTransfer = async () => {
-
-    const params = JSON.stringify({
-        "source": "balance",
-        "reason": "Calm down",
-        "amount": 3794800,
-        "recipient": "RCP_gx2wn530m0i3w3m"
-    })
-
-    const options = {
-        hostname: 'api.paystack.co',
-        port: 443,
-        path: '/transfer',
-        method: 'POST',
-        headers: {
-            Authorization: PAYSTACK_SECRET_KEY,
-            'Content-Type': 'application/json'
-        }
-    }
-
-    const req = https.request(options, res => {
-        let data = ''
-
-        res.on('data', (chunk) => {
-            data += chunk
+            res.on('end', () => {
+                try {
+                    console.log(JSON.parse(data))
+                    resolve(JSON.parse(data));
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }).on('error', error => {
+            reject(error);
         });
 
-        res.on('end', () => {
-            console.log(JSON.parse(data))
-        })
-    }).on('error', error => {
-        console.error(error)
-    })
-
-    req.write(params)
-    req.end()
-}
-
-// const initiateTransfer = async (recipientCode, amount) => {
-//     try {
-//         const response = await axiosInstance.post('/transfer', {
-//             source: 'balance',
-//             amount: amount * 100,  // Convert amount to kobo
-//             recipient: recipientCode,
-//         });
-//         return response.data;
-//     } catch (error) {
-//         throw error;
-//     }
-// };
+        req.write(params);
+        req.end();
+    });
+};
 
 
 
 
-// const initiateTransfer = async (recipientCode, amount) => {
-//     try {
-//         const response = await axiosInstance.post('/transfer', {
-//             source: 'balance',
-//             amount: amount * 100,  // Convert amount to kobo
-//             recipient: recipientCode,
-//         });
-//         return response.data;
-//     } catch (error) {
-//         throw error;
-//     }
-// };
+
+const initiateTransfer = async (recipient_code, payoutAmount) => {
+    return new Promise((resolve, reject) => {
+        const params = JSON.stringify({
+            "source": "balance",
+            "reason": "From Thrift",
+            "amount": payoutAmount,
+            "recipient": recipient_code
+        });
+
+        const options = {
+            hostname: 'api.paystack.co',
+            port: 443,
+            path: '/transfer',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const req = https.request(options, res => {
+            let data = '';
+
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            res.on('end', () => {
+                try {
+                    console.log(JSON.parse(data))
+                    resolve(JSON.parse(data));
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }).on('error', error => {
+            reject(error);
+        });
+
+        req.write(params);
+        req.end();
+    });
+};
+
+
+
+
+
+
 
 module.exports = {
     createCustomer,
