@@ -23,7 +23,7 @@ const createThrift = async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-}; 
+};
 
 // Join a thrift
 
@@ -86,9 +86,19 @@ const paymentVerification = async (req, res) => {
     if (paymentDetails.data.status && user) {
 
       const amount = paymentDetails.data.amount / 100
-      thrift.hasContributed.push(user._id)
-      thrift.potentialReceiver.push(user._id)
-      thrift.totalContributions += amount
+
+
+      const alreadypaid = thrift.hasContributed.find(user._id)
+      if (!alreadypaid) {
+        thrift.hasContributed.push(user._id)
+        thrift.potentialReceiver.push(user._id)
+        thrift.totalContributions += amount
+      }else {
+        return res.status(404).json({ message: 'User has paid' });
+
+      }
+
+
       await thrift.save();
 
     }
@@ -150,7 +160,7 @@ const recieveThrift = async (req, res) => {
 
     }
 
-    console.log(user)
+    // console.log("i am here USER", user)
 
 
     const userRecipientDetails = await paystack.createTransferRecipient(
@@ -158,27 +168,51 @@ const recieveThrift = async (req, res) => {
       user.bankDetails.accountNumber,
       user.bankDetails.bankCode
     );
+    console.log("Check here")
+    console.log("userRecDets",userRecipientDetails)
 
-    const {recipient_code} = userRecipientDetails.data
+    const statusTrue = userRecipientDetails.status;
+    const statusActive = userRecipientDetails.data.status;
+
+    const adminId = thrift.adminId
+
+    const admin = Admin.findById({ _id: adminId })
+
+    if (statusTrue || statusActive) {
+      
+
+
+    }
+
+    
+
+
+
+
+
+
+
+
+
+
+    const { recipient_code } = userRecipientDetails.data
 
     await paystack.initiateTransfer(recipient_code, payoutAmount);
 
 
     // Create a transfer recipient for the admin and initiate transfer
-    const adminId = thrift.adminId
-
-    const admin = Admin.findById({_id: adminId})
+    
     const adminRecipientDetails = await paystack.createTransferRecipient(
       admin.fullname,
       admin.bankDetails.accountNumber,
       admin.bankDetails.bankCode
     );
 
-    const {data} = adminRecipientDetails
+    const { data } = adminRecipientDetails
 
     await paystack.initiateTransfer(data.recipient_code, adminFee);
 
-    res.json({ selectedUser,admin, adminFee, userRecipientDetails, adminRecipientDetails });
+    res.json({ selectedUser, admin, adminFee, userRecipientDetails, adminRecipientDetails });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
