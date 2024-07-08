@@ -62,23 +62,26 @@ const paymentVerification = async (req, res) => {
         console.log("DETAILS" , paymentDetails)
         const {customer, authorization} = paymentDetails.data;
 
-        console.log("cutomer", customer)
-
         // Create a subscription using the authorization code
         const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
         
-        const {customerId} =  customer
-        const user = await User.findOne({customerId})
+        const paystackCustomerId =  customer.id
+
+        console.log(paystackCustomerId)
+
+        const user = await User.findOne({paystackCustomerId})
+        console.log(user)
 
 
         const thrift = await Thrift.findOne({planId})
-        
+        console.log(thrift)
 
         if (!thrift) {
           return res.status(404).json({ message: 'Thrift plan not found' });
         }
+
     
-        if (paymentDetails.status && user) {
+        if (paymentDetails.data.status && user) {
 
           const amount = paymentDetails.data.amount / 100
           thrift.hasContributed.push(user._id)
