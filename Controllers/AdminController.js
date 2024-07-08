@@ -87,5 +87,21 @@ const logoutAdmin = async (req, res) => {
   res.status(200).json({ message: "Logout successful" });
 };
 
+const updateAdmin = async (req, res) => {
+    const adminId = req.params.id;
+    const updates = req.body;
 
-module.exports = { adminLogin, adminRegister, logoutAdmin }
+    try {
+        const admin = await Admin.findByIdAndUpdate(adminId, updates, { new: true });
+
+        if (!admin) {
+            return res.status(404).json({ message: "Admin not found" });
+        }
+
+        res.status(200).json(admin);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+module.exports = { adminLogin, adminRegister, logoutAdmin,updateAdmin }
