@@ -13,7 +13,18 @@ const createThrift = async (req, res) => {
     const thriftExist = await Thrift.findOne({planId})
     if (thriftExist) {
       return res.status(400).json({ message: 'Thrift with this planId already exists' });
-    }
+      const thriftExist = await Thrift.findOne({planId})
+      if (thriftExist) {
+        return res.status(400).json({ message: 'Thrift with this planId already exists' });
+      }
+      
+        const thrift = new Thrift({ name, description, planId, amount, adminId: req.user._id });
+        thrift.contributions.push({ amount });
+        await thrift.save();
+        res.status(201).json(thrift);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+   }
     
       const thrift = new Thrift({ name, description, planId, amount, adminId: req.user._id });
       thrift.contributions.push({ amount });
@@ -69,13 +80,38 @@ const paymentVerification = async (req, res) => {
         // Create a subscription using the authorization code
         const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
         console.log("subscriptionId", subscriptionId)
+        // Create a subscription using the authorization code
+        const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
+        
+        const paystackCustomerId =  customer.id
 
-        const thrift = Thrift.findOne(planId)
+        console.log(paystackCustomerId)
+
+        const user = await User.findOne({paystackCustomerId})
+        console.log(user)
+
 
         if (subscriptionId.status) {
           
           res.status(200).json({ subscriptionId, paymentDetails });
+        const thrift = await Thrift.findOne({planId})
+        console.log(thrift)
+
+        if (!thrift) {
+          return res.status(404).json({ message: 'Thrift plan not found' });
         }
+
+    
+        if (paymentDetails.data.status && user) {
+
+          const amount = paymentDetails.data.amount / 100
+          thrift.hasContributed.push(user._id)
+          thrift.potentialReceiver.push(user._id)
+          thrift.totalContributions += amount
+          await thrift.save();
+    
+          }
+        res.status(200).json({ subscriptionId, paymentDetails });
 
     } catch (error) {
         res.status(400).json({ message: error.message });

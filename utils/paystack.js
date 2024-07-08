@@ -174,41 +174,51 @@ const createCustomer = async (email, firstName, lastName) => {
 };
 
 
-
 const createSubscription = async (customerId, planId) => {
-    const params = JSON.stringify({
-        "customer": customerId,
-        "plan": planId
-    })
+  const params = JSON.stringify({
+    "customer": customerId,
+    "plan": planId
+  });
 
-    const options = {
-        hostname: 'api.paystack.co',
-        port: 443,
-        path: '/subscription',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
-            'Content-Type': 'application/json'
-        }
+  const options = {
+    hostname: 'api.paystack.co',
+    port: 443,
+    path: '/subscription',
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+      'Content-Type': 'application/json'
     }
+  };
 
+  return new Promise((resolve, reject) => {
     const req = https.request(options, res => {
-        let data = ''
+      let data = '';
 
-        res.on('data', (chunk) => {
-            data += chunk
-        });
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
 
-        res.on('end', () => {
-            console.log("[res Data]", JSON.parse(data))
-        })
-    }).on('error', error => {
-        console.error("[Create Subscription Error]", error)
-    })
+      res.on('end', () => {
+        try {
+          const parsedData = JSON.parse(data);
+          console.log(parsedData)
+          resolve(parsedData);
+        } catch (error) {
+          reject(new Error('Error parsing JSON response'));
+        }
+      });
+    });
 
-    req.write(params)
-    req.end()
-}
+    req.on('error', error => {
+      reject(new Error(`Create Subscription Error: ${error.message}`));
+    });
+
+    req.write(params);
+    req.end();
+  });
+};
+
 
 // const createSubscription = async (customerId, planId) => {
 //     try {

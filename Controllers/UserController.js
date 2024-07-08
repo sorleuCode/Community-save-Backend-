@@ -8,6 +8,7 @@ const userRegister = async (req, res) => {
     const { fullname, email, password, bankName, accountNumber, bankCode } = req.body;
 
     const userExist = await User.findOne({email})
+    const userExist = await User.findOne({ email })
 
     if (userExist) {
         return res.status(400).json({ message: 'User with this email already exists' });
@@ -61,12 +62,12 @@ const userLogin = async (req, res) => {
 const getAllUsers = async (req, res) => {
 
     const users = await User.find().sort("-createdAt");
-  
+
     if (!users) {
-      res.status(500)
-      throw new Error("Something went wrong!")
+        res.status(500)
+        throw new Error("Something went wrong!")
     }
     res.status(200).json(users)
-  };
+};
 
-module.exports = {userRegister, userLogin, getAllUsers};
+module.exports = { userRegister, userLogin, getAllUsers };
