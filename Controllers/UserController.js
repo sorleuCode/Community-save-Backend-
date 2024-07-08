@@ -7,7 +7,6 @@ const bcrypt = require("bcryptjs")
 const userRegister = async (req, res) => {
     const { fullname, email, password, bankName, accountNumber, bankCode } = req.body;
 
-    const userExist = await User.findOne({email})
     const userExist = await User.findOne({ email })
 
     if (userExist) {
@@ -70,4 +69,38 @@ const getAllUsers = async (req, res) => {
     res.status(200).json(users)
 };
 
-module.exports = { userRegister, userLogin, getAllUsers };
+const updateUser = async (req, res) => {
+    try {
+      const userId = req.params.id;
+      console.log(`Updating user with ID: ${userId}`);
+  
+      const user = await User.findById(userId);
+  
+      if (!user) {
+        console.error(`User with ID ${userId} not found`);
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const { email, fullname, bankName, accountNumber, bankCode } = req.body;
+  
+      if (email) user.email = email;
+      if (fullname) user.fullname = fullname;
+  
+      // Ensure bankDetails object exists before updating its properties
+      if (!user.bankDetails) {
+        user.bankDetails = {};
+      }
+      if (bankName) user.bankDetails.bankName = bankName;
+      if (accountNumber) user.bankDetails.accountNumber = accountNumber;
+      if (bankCode) user.bankDetails.bankCode = bankCode;
+  
+      const updatedUserDetails = await user.save();
+      res.json(updatedUserDetails);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      res.status(400).json({ message: error.message });
+    }
+  };
+  
+  
+module.exports = { userRegister, userLogin, getAllUsers, updateUser };

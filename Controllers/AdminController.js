@@ -71,21 +71,57 @@ const adminLogin = async (req, res) => {
     }
 };
 
+
+
 const logoutAdmin = async (req, res) => {
 
 
-  // Clear the "token" cookie by setting it to an empty string and an expiration date in the past
-  res.cookie("token", "", {
-    path: "/",
-    httpOnly: true,
-    expires: new Date(0), // Setting the expiration date to a time in the past to effectively delete the cookie
-    sameSite: "none",     // This attribute helps with cross-site request protection
-    secure: true,         // Ensures the cookie is sent only over HTTPS
-  });
-
-  // Send a 200 OK response with a message indicating successful logout
-  res.status(200).json({ message: "Logout successful" });
+    // Clear the "token" cookie by setting it to an empty string and an expiration date in the past
+    res.cookie("token", "", {
+      path: "/",
+      httpOnly: true,
+      expires: new Date(0), // Setting the expiration date to a time in the past to effectively delete the cookie
+      sameSite: "none",     // This attribute helps with cross-site request protection
+      secure: true,         // Ensures the cookie is sent only over HTTPS
+    });
+  
+    // Send a 200 OK response with a message indicating successful logout
+    res.status(200).json({ message: "Logout successful" });
 };
+  
+const updateAdmin = async (req, res) => {
+    try {
+      const adminId = req.params.id;
+      console.log(`Updating Admin with ID: ${adminId}`);
+  
+      const admin = await Admin.findById(adminId);
+  
+      if (!admin) {
+        console.error(`User with ID ${adminId} not found`);
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const { email, fullname, bankName, accountNumber, bankCode } = req.body;
+  
+      if (email) admin.email = email;
+      if (fullname) admin.fullname = fullname;
+  
+      // Ensure bankDetails object exists before updating its properties
+      if (!admin.bankDetails) {
+        admin.bankDetails = {};
+      }
+      if (bankName) admin.bankDetails.bankName = bankName;
+      if (accountNumber) admin.bankDetails.accountNumber = accountNumber;
+      if (bankCode) admin.bankDetails.bankCode = bankCode;
+  
+      const updatedAdminDetails = await admin.save();
+      res.json(updatedAdminDetails);
+    } catch (error) {
+      console.error('Error updating admin:', error);
+      res.status(400).json({ message: error.message });
+    }
+  };
+  
 
 
-module.exports = { adminLogin, adminRegister, logoutAdmin }
+module.exports = { adminLogin, adminRegister, logoutAdmin, updateAdmin }
