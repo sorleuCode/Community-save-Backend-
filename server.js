@@ -7,9 +7,11 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const connectDB = require("./config/DBConnet")
 const errorHandler = require("./middleware/errorMiddleware");
+// const cron = require('node-cron');
 const adminRoute = require("./routes/adminRoute");
 const userRoute = require("./routes/userRoute");
 const thriftRoute = require("./routes/thriftRoute")
+// const Paystack = require("./utils/paystack")
 
 const PORT = process.env.PORT || 3500;
 
@@ -32,7 +34,16 @@ app.use(cors({
     methods: "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS"
 }))
 
+// const task = cron.schedule('*/1 12 * * * *', () => {
+//     console.log(Paystack.verifyPayment)
+//     // console.log('running a task every 5 seconds', Math.random());
 
+//     setTimeout(() => {
+//         task.stop()
+//     }, 10000)
+// });
+
+// task.stop()
 
 app.get("/", (req, res) => {
     res.send("We're live!")
