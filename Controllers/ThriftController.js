@@ -25,7 +25,6 @@ const createThrift = async (req, res) => {
   }
 };
 
-
 // Join a thrift
 
 const joinThrift = async (req, res) => {
@@ -62,40 +61,34 @@ const paymentVerification = async (req, res) => {
   try {
     const paymentDetails = await paystack.verifyPayment(reference);
 
-    const user = await User.findOne({ paystackCustomerId })
-    console.log(user)
-        // Create a subscription using the authorization code
-  
+    console.log("DETAILS", paymentDetails)
+    const { customer, authorization } = paymentDetails.data;
+
+    // Create a subscription using the authorization code
+    const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
+
+    const paystackCustomerId = customer.id
+
+    console.log(paystackCustomerId)
 
     const user = await User.findOne({ paystackCustomerId })
     console.log(user)
-    
-        const thrift = await Thrift.findOne({planId})
-        console.log(thrift)
-    
+
+
+    const thrift = await Thrift.findOne({ planId })
+    console.log(thrift)
 
     if (!thrift) {
       return res.status(404).json({ message: 'Thrift plan not found' });
-      }
-
+    }
 
 
     if (paymentDetails.data.status && user) {
 
       const amount = paymentDetails.data.amount / 100
-
-
-      const alreadypaid = thrift.hasContributed.find(user._id)
-      if (!alreadypaid) {
-        thrift.hasContributed.push(user._id)
-        thrift.potentialReceiver.push(user._id)
-        thrift.totalContributions += amount
-      }else {
-        return res.status(404).json({ message: 'User has paid' });
-
-      }
-
-
+      thrift.hasContributed.push(user._id)
+      thrift.potentialReceiver.push(user._id)
+      thrift.totalContributions += amount
       await thrift.save();
 
     }
@@ -132,7 +125,6 @@ const recieveThrift = async (req, res) => {
 
     }
 
-
     // Check if all participants have contributed
     const allContributed = (thrift.hasContributed.length === thrift.participants.length)
 
@@ -158,8 +150,7 @@ const recieveThrift = async (req, res) => {
 
     }
 
-
-    // console.log("i am here USER", user)
+    console.log(user)
 
 
     const userRecipientDetails = await paystack.createTransferRecipient(
@@ -168,48 +159,26 @@ const recieveThrift = async (req, res) => {
       user.bankDetails.bankCode
     );
 
+    const {recipient_code} = userRecipientDetails.data
 
+    await paystack.initiateTransfer(recipient_code, payoutAmount);
+
+
+    // Create a transfer recipient for the admin and initiate transfer
+    const adminId = thrift.adminId
+
+    const admin = Admin.findById({_id: adminId})
     const adminRecipientDetails = await paystack.createTransferRecipient(
       admin.fullname,
       admin.bankDetails.accountNumber,
       admin.bankDetails.bankCode
     );
-    console.log("Check here")
-    console.log("userRecDets",userRecipientDetails)
-
-    const statusTrue = userRecipientDetails.status;
-    const statusActive = userRecipientDetails.data.status;
-
-    const adminId = thrift.adminId
-
-    const admin = Admin.findById({ _id: adminId })
-
-    console.log(admin)
-
-    if (statusTrue || statusActive) {
-
-        admin.recievedProfit = adminFee;
-
-        user.recievedPayment = payoutAmount;
-    }
-
-    await admin.save();
-    await user.save();
-
-    // const { recipient_code } = userRecipientDetails.data
-
-    // await paystack.initiateTransfer(recipient_code, payoutAmount);
-
-
-    // Create a transfer recipient for the admin and initiate transfer
     
-   
+    const {data} = adminRecipientDetails
 
-    // const { data } = adminRecipientDetails
+    await paystack.initiateTransfer(data.recipient_code, adminFee);
 
-    // await paystack.initiateTransfer(data.recipient_code, adminFee);
-
-    res.json({ selectedUser, admin, adminFee, userRecipientDetails, adminRecipientDetails });
+    res.json({ selectedUser,admin, adminFee, userRecipientDetails, adminRecipientDetails });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
