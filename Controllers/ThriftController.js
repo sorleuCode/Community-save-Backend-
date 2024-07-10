@@ -159,7 +159,7 @@ const recieveThrift = async (req, res) => {
       user.bankDetails.bankCode
     );
 
-    const {recipient_code} = userRecipientDetails.data
+    const { recipient_code } = userRecipientDetails.data
 
     await paystack.initiateTransfer(recipient_code, payoutAmount);
 
@@ -167,7 +167,7 @@ const recieveThrift = async (req, res) => {
     // Create a transfer recipient for the admin and initiate transfer
     const adminId = thrift.adminId
 
-    const admin = Admin.findById({_id: adminId})
+    const admin = Admin.findById({ _id: adminId })
     const adminRecipientDetails = await paystack.createTransferRecipient(
       admin.fullname,
       admin.bankDetails.accountNumber,
@@ -203,7 +203,7 @@ const recieveThrift = async (req, res) => {
 
     // await paystack.initiateTransfer(data.recipient_code, adminFee);
 
-    res.json({ selectedUser,admin, adminFee, userRecipientDetails, adminRecipientDetails });
+    res.json({ selectedUser, admin, adminFee, userRecipientDetails, adminRecipientDetails });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -222,6 +222,27 @@ const getAllThrifts = async (req, res) => {
   res.status(200).json(thrift)
 };
 
+const getAdminThrifts = async (req, res) => {
+
+  try {
+
+
+    const adminThrifts = await Thrift.find({ adminId: req.user._id }).sort("-createdAt");
+
+    if (!adminThrifts) {
+      res.status(500)
+      throw new Error("No thrifts created by this admin")
+    }
+    res.status(200).json(adminThrifts)
+
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+
+  }
+
+
+}
+
 
 // Delete a thrift (admin only)
 const deleteThrift = async (req, res) => {
@@ -239,4 +260,4 @@ const deleteThrift = async (req, res) => {
 
 };
 
-module.exports = { createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift, paymentVerification, getAllThrifts }
+module.exports = { createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift, paymentVerification, getAllThrifts, getAdminThrifts }
