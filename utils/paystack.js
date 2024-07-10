@@ -202,7 +202,7 @@ const createSubscription = async (customerId, planId) => {
       res.on('end', () => {
         try {
           const parsedData = JSON.parse(data);
-          console.log(parsedData)
+        //   console.log(parsedData)
           resolve(parsedData);
         } catch (error) {
           reject(new Error('Error parsing JSON response'));

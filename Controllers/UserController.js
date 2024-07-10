@@ -99,6 +99,8 @@ const userLogin = async (req, res) => {
 const getAllUsers = async (req, res) => {
   const users = await User.find().sort("-createdAt");
 
+  
+
   if (!users) {
     res.status(500);
     throw new Error("Something went wrong!");
