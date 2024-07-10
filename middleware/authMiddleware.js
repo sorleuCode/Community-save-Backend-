@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv')
 const Admin = require("../models/AdminModel");
+const User = require("../models/UserModel")
 
 const verifyToken = async (req, res, next) => {
 
@@ -49,4 +50,19 @@ const isAdmin = (req, res, next) => {
   next();
 };
 
-module.exports = { verifyToken, isAdmin };
+
+const isUser = async(req, res, next) => {
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
+  
+  req.user = await User.findById(decoded.id).select("-password");
+
+  if (!req.user) {
+    return res.status(401).json({ message: "This route is for user" });
+  }
+
+
+  next();
+};
+
+module.exports = { verifyToken, isAdmin, isUser };

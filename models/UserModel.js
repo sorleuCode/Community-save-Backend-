@@ -7,6 +7,8 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     recievedPayment: { type: Number},
     paystackCustomerId: { type: Number, required: true }, // Paystack customer ID
+    phoneNumber: { type: Number, required: true },
+    address: { type: String, required: true },
     bankDetails: {
         bankName: { type: String, required: true },
         accountNumber: { type: String, required: true },
