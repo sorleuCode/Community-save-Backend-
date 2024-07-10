@@ -61,26 +61,18 @@ const paymentVerification = async (req, res) => {
   try {
     const paymentDetails = await paystack.verifyPayment(reference);
 
-    console.log("DETAILS", paymentDetails)
-    const { customer, authorization } = paymentDetails.data;
-
-    // Create a subscription using the authorization code
-    const subscriptionId = await paystack.createSubscription(customer.id, planId, authorization.authorization_code);
-
-    const paystackCustomerId = customer.id
-
-    console.log(paystackCustomerId)
-
     const user = await User.findOne({ paystackCustomerId })
     console.log(user)
-
+    // Create a subscription using the authorization code
 
     const thrift = await Thrift.findOne({ planId })
     console.log(thrift)
 
+
     if (!thrift) {
       return res.status(404).json({ message: 'Thrift plan not found' });
     }
+
 
 
     if (paymentDetails.data.status && user) {
@@ -88,9 +80,9 @@ const paymentVerification = async (req, res) => {
       const amount = paymentDetails.data.amount / 100
 
 
-        thrift.hasContributed.push(user._id)
-        thrift.potentialReceiver.push(user._id)
-        thrift.totalContributions += amount
+      thrift.hasContributed.push(user._id)
+      thrift.potentialReceiver.push(user._id)
+      thrift.totalContributions += amount
 
 
       await thrift.save();
@@ -128,6 +120,7 @@ const recieveThrift = async (req, res) => {
       return res.status(404).json({ message: 'Thrift not found' });
 
     }
+
 
     // Check if all participants have contributed
     const allContributed = (thrift.hasContributed.length === thrift.participants.length)
@@ -176,19 +169,19 @@ const recieveThrift = async (req, res) => {
 
     const admin = Admin.findById({ _id: adminId })
 
-    
+
     if (statusTrue || statusActive) {
 
       admin.recievedProfit = adminFee;
 
       user.recievedPayment = payoutAmount;
-  }
+    }
 
-  await admin.save();
-  await user.save();
+    await admin.save();
+    await user.save();
 
 
-    
+
 
 
 
@@ -205,8 +198,8 @@ const recieveThrift = async (req, res) => {
 
 
     // Create a transfer recipient for the admin and initiate transfer
-    
-    
+
+
 
     // const { data } = adminRecipientDetails
 
@@ -248,4 +241,4 @@ const deleteThrift = async (req, res) => {
 
 };
 
-module.exports = { createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift, paymentVerification, getAllThrifts }
+module.exports = { createThrift, joinThrift, deleteThrift, recieveThrift, contributeThrift, paymentVerification, getAllThrifts }

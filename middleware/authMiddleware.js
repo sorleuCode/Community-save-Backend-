@@ -4,15 +4,17 @@ const Admin = require("../models/AdminModel");
 
 const verifyToken = async (req, res, next) => {
 
-  const authHeader = req.headers["authorization"] || req.headers["Authorization"];
+  // const authHeader = req.headers["authorization"] || req.headers["Authorization"];
 
 
-  if (authHeader && authHeader.startsWith("Bearer")) {
+  const token = req.cookies.token;
+  // if (authHeader && authHeader.startsWith("Bearer")) {
+  if (token) {
 
     try {
 
-      const token = authHeader.split(" ")[1];
-      console.log(token)
+      // const token = authHeader.split(" ")[1];
+        console.log(token)
       if (!token) {
         res.status(401);
         throw new Error("Not authorized, no token");

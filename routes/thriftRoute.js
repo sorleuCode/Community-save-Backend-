@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {isAdmin, verifyToken} = require("../middleware/authMiddleware")
+const { verifyToken, isAdmin } = require("../middleware/authMiddleware");
 const { createThrift, joinThrift, deleteThrift, recieveThrift, paymentVerification, getAllThrifts} = require("../Controllers/ThriftController");
 
 router.post("/create", verifyToken, isAdmin, createThrift);
