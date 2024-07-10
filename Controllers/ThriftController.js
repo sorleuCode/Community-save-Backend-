@@ -17,7 +17,7 @@ const createThrift = async (req, res) => {
     }
 
     const thrift = new Thrift({ name, description, planId, amount, adminId: req.user._id });
-    thrift.contributions.push({ amount });
+    // thrift.contributions.push({ amount });
     await thrift.save();
     res.status(201).json(thrift);
   } catch (error) {
@@ -159,9 +159,9 @@ const recieveThrift = async (req, res) => {
       user.bankDetails.bankCode
     );
 
-    const { recipient_code } = userRecipientDetails.data
+    // const { recipient_code } = userRecipientDetails.data
 
-    await paystack.initiateTransfer(recipient_code, payoutAmount);
+    // await paystack.initiateTransfer(recipient_code, payoutAmount);
 
 
     // Create a transfer recipient for the admin and initiate transfer
